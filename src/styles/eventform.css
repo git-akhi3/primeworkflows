@@ -1,0 +1,40 @@
+.event-form {
+  width: 100%;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.event-form select {
+  width: calc(100% - 39px); /* Adjust width to fit within the offcanvas */
+  padding: 5px;
+  margin-bottom: 10px;
+}
+
+.event-name-list {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  overflow-x: hidden; /* Adjust overflow-x */
+  font-size: 13px;
+  font-family:sans-serif;
+}
+
+.event-card {
+  box-sizing: border-box;
+  background-color: #f4f4f4;
+  padding: 5px;
+  margin-right: 2px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: calc(100% - 30px); /* Adjust width to fit within the offcanvas */
+}
+
+.event-card:hover {
+  background-color: #eaeaea;
+}
+
+.highlight {
+  background-color: yellow; 
+}

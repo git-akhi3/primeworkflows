@@ -1,0 +1,101 @@
+.dndflow {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  overflow: hidden;
+  padding-right: 0; 
+  z-index: 1;
+}
+.dndflow.show-offcanvas {
+  padding-right: 200px; /* Adjust padding when offcanvas is shown */
+}
+.dndflow aside {
+  border-left: 1px solid #eee;
+  padding: 15px 10px;
+  font-size: 12px;
+  background: #fcfcfc;
+  width: 120px;
+  order: -1;
+}
+.dndflow .offcanvas {
+  overflow-y: auto;
+  width: 0;
+}
+
+.dndflow .offcanvas.show {
+  width:350px;  /* Set this to the width you want */
+}
+
+.dndflow .reactflow-wrapper {
+  flex-grow: 1;
+  height: 100%;
+}
+
+
+.offcanvas {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 100%;
+  overflow-y: auto;
+  transition: width 0.3s ease-in-out;
+  background: #979696;
+  z-index: 3;
+}
+.offcanvas.show {
+  width: 250px; /* Set this to the width you want */
+}
+.reactflow-wrapper {
+  flex-grow: 1;
+  transition: margin-right 0.3s ease-in-out;
+}
+.offcanvas.show ~ .reactflow-wrapper {
+  margin-right: 250px; /* Adjust margin when offcanvas is shown */
+}
+.dndflow .dndnode {
+  height: 20px;
+  padding: 4px;
+  border: 1px solid #1a192b;
+  border-radius: 2px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: grab;
+}
+
+.dndflow .dndnode.event {
+  background-color: #FF6961;
+  border: 1px solid #1a192b;
+  border-radius: 15px;
+}
+
+.dndflow .dndnode.action {
+  background-color: #FDFD96;
+  border: 1px solid #1a192b;
+  border-radius: 15px;
+}
+.dndflow .dndnode.condition {
+  background-color: #C3EEFA;
+  border: 1px solid #1a192b;
+  border-radius: 15px;
+}
+
+
+.dndflow .selectall {
+  margin-top: 10px;
+}
+
+@media screen and (min-width: 768px) {
+  .dndflow aside {
+    max-width: 250px;
+    left: 0;
+  }
+}
+
+.offcanvasheader{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
