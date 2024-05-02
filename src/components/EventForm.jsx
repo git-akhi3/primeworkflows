@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { fetchEventTypes, fetchEventNames } from '../api/api.js';
 import '../styles/eventform.css'
 
-const EventForm = ({ addNode }) => {
+const EventForm = () => {
   const [eventTypes, setEventTypes] = useState([]);
   const [eventNames, setEventNames] = useState([]);
   const [selectedEventType, setSelectedEventType] = useState('');
-  const [selectedEventName, setSelectedEventName] = useState({name:'',type:''});
-  const [submittedEvent, setSubmittedEvent] = useState(null);
+  const [selectedEventName, setSelectedEventName] = useState('');
 
   useEffect(() => {
     fetchEventTypes().then(setEventTypes);
@@ -26,12 +25,7 @@ const EventForm = ({ addNode }) => {
     }
     
     
-    setSubmittedEvent({ type: selectedEventType, name: selectedEventName });
-    
-    
-    addNode(selectedEventType, selectedEventName);
-
-    // Reset form fields
+    updateNodeData({ type: selectedEventType, name: selectedEventName });
     setSelectedEventType('');
     setSelectedEventName('');
   };

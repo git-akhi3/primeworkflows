@@ -13,7 +13,7 @@
   border-left: 1px solid #eee;
   padding: 15px 10px;
   font-size: 12px;
-  background: #fcfcfc;
+  background: #8ea1a2;
   width: 120px;
   order: -1;
 }
@@ -23,7 +23,7 @@
 }
 
 .dndflow .offcanvas.show {
-  width:350px;  /* Set this to the width you want */
+  width:200px;  /* Set this to the width you want */
 }
 
 .dndflow .reactflow-wrapper {
@@ -36,16 +36,16 @@
   position: fixed;
   top: 0;
   right: 0;
-  width: 0;
+  width: 350px;
   height: 100%;
   overflow-y: auto;
   transition: width 0.3s ease-in-out;
-  background: #979696;
+  background: #dfdada;
   z-index: 3;
 }
-.offcanvas.show {
+/* .offcanvas.show {
   width: 250px; /* Set this to the width you want */
-}
+ */
 .reactflow-wrapper {
   flex-grow: 1;
   transition: margin-right 0.3s ease-in-out;

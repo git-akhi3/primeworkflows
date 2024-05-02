@@ -26,7 +26,7 @@
   padding: 5px;
   margin-right: 2px;
   margin-bottom: 10px;
-  border-radius: 5px;
+  border-radius: 7px;
   cursor: pointer;
   width: calc(100% - 30px); /* Adjust width to fit within the offcanvas */
 }
@@ -36,5 +36,5 @@
 }
 
 .highlight {
-  background-color: yellow; 
+  background-color: rgb(61, 247, 51); 
 }

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback,useEffect } from 'react';
 import ReactFlow, {
   ReactFlowProvider,
   addEdge,
@@ -6,7 +6,6 @@ import ReactFlow, {
   useEdgesState,
   Controls,
   Background,
-  Panel
 } from 'reactflow';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { Button } from 'react-bootstrap';
@@ -34,6 +33,7 @@ const DnDFlow = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
+  const [nodeName, setNodeName] = useState('Node 1');
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
     [],
@@ -44,18 +44,17 @@ const DnDFlow = () => {
     event.dataTransfer.dropEffect = 'move';
   }, []);
   const [show, setShow] = useState(false);
-
   const handleClose = () => setShow(false);
 
   const onDrop = useCallback(
     (event) => {
       event.preventDefault();
-
       const type = event.dataTransfer.getData('application/reactflow');
       if (typeof type === 'undefined' || !type) {
         return;
       }
       setShow(true);
+      if(reactFlowInstance){
       const position = reactFlowInstance.screenToFlowPosition({
         x: event.clientX,
         y: event.clientY,
@@ -70,9 +69,11 @@ const DnDFlow = () => {
       };
 
       setNodes((nds) => nds.concat(newNode));
+    }
     },
     [reactFlowInstance],
   );
+  
   
 
   return (
@@ -82,11 +83,11 @@ const DnDFlow = () => {
       <Offcanvas.Header >
         <div className="offcanvasheader">
         <Offcanvas.Title><h1>Events</h1></Offcanvas.Title>
-        <Button variant="secondary" onClick={handleClose}>Close</Button>
+        <Button variant="secondary" onClick={handleClose}>X</Button>
         </div>
       </Offcanvas.Header>
       <Offcanvas.Body>
-       <div>
+      <div>
         <EventForm/>
         </div>
       </Offcanvas.Body>
@@ -103,6 +104,7 @@ const DnDFlow = () => {
             onInit={setReactFlowInstance}
             onDrop={onDrop}
             onDragOver={onDragOver}
+            onLoad={setReactFlowInstance}
             fitView
           >
             <Controls />
@@ -111,51 +113,10 @@ const DnDFlow = () => {
           </ReactFlow>
         </div>
         <Sidebar />
-         <SaveRestore />
+      
       </ReactFlowProvider>
     </div>
   );
 };
 
 export default DnDFlow;
-
-const SaveRestore = () => {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const [rfInstance, setRfInstance] = useState(null);
-  const { setViewport } = useReactFlow();
-
-  const onSave = useCallback(() => {
-    if (rfInstance) {
-      const flow = rfInstance.toObject();
-      localStorage.setItem(flowKey, JSON.stringify(flow));
-    }
-  }, [rfInstance]);
-  
-  const onRestore = useCallback(() => {
-    const restoreFlow = async () => {
-      const flow = JSON.parse(localStorage.getItem(flowKey));
-      if (flow) {
-        const { x = 0, y = 0, zoom = 1 } = flow.viewport;
-        setNodes(flow.nodes || []);
-        setEdges(flow.edges || []);
-        setViewport({ x, y, zoom });
-      }
-    };
-    restoreFlow();
-  }, [setNodes, setViewport]);
-
-  return (
-    <div>
-    <ReactFlow
-    onInit={setRfInstance}
-    >
-    <Panel position="top-right">
-        <button onClick={onSave}>save</button>
-        <button onClick={onRestore}>restore</button>
-        <button onClick={onAdd}>add node</button>
-      </Panel>
-    </ReactFlow>
-    </div>
-  );
-};
