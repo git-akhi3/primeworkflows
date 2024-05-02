@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { fetchEventTypes, fetchEventNames } from '../api/api.js';
 import '../styles/eventform.css'
 
-const EventForm = () => {
+const EventForm = ({ updateNodeData }) => {
   const [eventTypes, setEventTypes] = useState([]);
   const [eventNames, setEventNames] = useState([]);
   const [selectedEventType, setSelectedEventType] = useState('');
-  const [selectedEventName, setSelectedEventName] = useState('');
+  const [selectedEventName, setSelectedEventName] = useState({name:'',type:''});
 
   useEffect(() => {
     fetchEventTypes().then(setEventTypes);
