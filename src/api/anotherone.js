@@ -6,19 +6,18 @@ const sendWorkflowData = async (workflowData,actionBody) => {
   try {
 
     const formattedData = formatWorkflowData(workflowData,actionBody);
-    console.log(JSON.stringify(formattedData, null, 2));
+    console.log('Formatted data:', JSON.stringify(formattedData, null, 2));
     const requestOptions = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
       },
-      body:(formattedData),
+      body: JSON.stringify(formattedData),
     };
     
     fetch('/prime/api/workflow/create', requestOptions)
       .then(response => {
-        console.log(requestOptions);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -57,57 +56,53 @@ const formatWorkflowData = (workflowData,actionBody) => {
     };
   });
   const formattedData = {
-  workflows: [
+   workflows: [
       {
         id: workflowData.nodes[0]?.id,
         workflowId: "123",
         workflowName: "Test Workflow",
-        starttask: "task1",
+        starttask: workflowData.nodes[0]?.data.taskName,
         tasks: [
-          {
-          taskName: "task1" ,
-          taskType: "event",
-          nextTask: workflowData.edges
+          { taskName: "Task 1" },
+          {taskType: workflowData.taskType},
+          { nextTask: workflowData.edges
             .filter((edge) => edge.source === node.id)
             .reduce((acc, edge) => {
-          acc[edge.sourceHandle] = workflowData.nodes.find((node) => node.id === edge.target)?.data.taskName;
-            return acc;
+              acc[edge.sourceHandle] = workflowData.nodes.find((node) => node.id === edge.target)?.data.taskName;
+              return acc;
             }, {}),
           },
-        {
-        taskName: "task2",
-        taskType: "action",
+        ],
+        taskName: workflowData.taskName,
+        taskType: workflowData.taskType,
           taskBody: {
-            action: "SEND_EMAIL",
-            actionBody: 
+            action: ActionForm.selectedActionType,
+            actionBody: [
               {
-                to: "goutham@ezynest.com",
-                cc: "madhu@eazynest.com",
-                bcc: "vamshi@ezynest.com",
-                subject: "test email success",
-                content: "condition is true"
-              }
-            
-        }
+                to: ActionForm.to,
+                cc: ActionForm.cc,
+                bcc: ActionForm.bcc,
+                subject: ActionForm.subject,
+                content: ActionForm.content
+              },
+            ],
         },
-        {
-        taskName: "task3",
-        taskType:"action",
+        taskName: workflowData.taskName,
+        taskType: workflowData.taskType,
           taskBody: {
-            action: "SEND_EMAIL",
-            actionBody: 
+            action: ActionForm.selectedActionType,
+            actionBody: [
               {
-                to: "goutham@ezynest.com",
-                cc: "madhu@eazynest.com",
-                bcc: "vamshi@ezynest.com",
-                subject: "test email success",
-                content: "condition is flase"
-              }
-        }
-      },
-      {
-        taskName: "task4",
-        taskType: "condition",
+                to: ActionForm.to,
+                cc: ActionForm.cc,
+                bcc: ActionForm.bcc,
+                subject: ActionForm.subject,
+                content: ActionForm.content
+              },
+            ],
+        },
+        taskName: workflowData.taskName,
+        taskType: workflowData.taskType,
           taskBody: {
             conditions: [
               {
@@ -115,23 +110,14 @@ const formatWorkflowData = (workflowData,actionBody) => {
                 clause:"CONTAINS",
                 targetVariable:"email subject",
                 targetValue:"goutham"
-              }
-            ]
+              },
+            ],
         },
-        nextTask:{
-          "true":["task3"],
-          "false":["task2"]
-        }
-      }
+      },
     ],
-        user:"null",
-        differentiator:"null",
-      }
-   ]
-  }
+  };
 
   return formattedData;
 };
 
 export { sendWorkflowData };
-

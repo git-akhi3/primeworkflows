@@ -8,9 +8,12 @@ import ReactFlow, {
   addEdge,
   useEdgesState,
   useNodesState,
+  Panel
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import EventForm from './EventForm';
+import ConditionForm from './ConditionForm';
+import ActionForm  from './ActionForm';
 
 import Sidebar from './Sidebar';
 
@@ -27,17 +30,23 @@ const initialNodes = [
 ];
 
 let id = 0;
-const getId = () => `dndnode_${id++}`;
+const getId = () => `${id++}`;
 
 const DnDFlow = () => {
   const reactFlowWrapper = useRef(null);
   const [nodes, setNodes,onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges,onEdgesChange] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
-  const [show, setShow] = useState(false);
   const [lastNodeId, setLastNodeId] = useState(null);
+  const [showEventForm, setShowEventForm] = useState(false);
+  const [showActionForm, setShowActionForm] = useState(false);
+  const [showConditionForm, setShowConditionForm] = useState(false);
+  const handleCloseEventForm = () => setShowEventForm(false);
+  const handleCloseActionForm = () => setShowActionForm(false);
+  const handleCloseConditionForm = () => setShowConditionForm(false);
+  const [isSaveWorkflowClicked, setIsSaveWorkflowClicked] = useState(false);
+  const [workflowName, setWorkflowName] = useState('');
 
-  const handleClose = () => setShow(false);
 
   useEffect(() => {
     // Set initial nodes
@@ -60,81 +69,109 @@ const DnDFlow = () => {
       if (typeof type === 'undefined' || !type) {
         return;
       }
+      if (type === 'event') {
+        setShowEventForm(true);
+      } else if (type === 'action') {
+        setShowActionForm(true);
+      } else if (type === 'condition') {
+        setShowConditionForm(true);
+      }
       const position = reactFlowInstance.project({
-        x: event.clientX,
-        y: event.clientY - 40,
+        x: event.clientX ,
+        y: event.clientY,
       });
       const newNodeId = getId();
       const newNode = {
         id: newNodeId,
         type,
         position,
-        data: { label: `${type} node` },
+        data: { label: `${type} `,
+        taskName: `Node ${lastNodeId + 1}`
+      },
       };
       setNodes((ns) => ns.concat(newNode));
       setLastNodeId(newNodeId);
-      setShow(true);
-      },
-    [reactFlowInstance,setShow]
+    },
+    [reactFlowInstance]
   );
-  const updateNodeData = useCallback((eventData) => {
-
+  const updateNodeData = useCallback(( nodeType, label) => {
+    console.log("Updating node data with label:", label);
     const updatedNodes = nodes.map(node => {
-      if (node.id === lastNodeId) {
+      if (node.id === lastNodeId ) {
         return {
           ...node,
           data: {
             ...node.data,
-            label: `${eventData.type}: ${eventData.name}`
+            label: label
           }
         };
       }
       return node;
     });
-  
     setNodes(updatedNodes);
-    handleClose();
-  }, [nodes, lastNodeId, handleClose]);
+  }, [nodes, lastNodeId]);
 
+  
+  const [actionBody, setActionBody] = useState(null);
+  const handleActionSubmit = (actionData) => {
+    setActionBody(actionData);
+  };
   const handleSaveWorkflow = () => {
-    
     const workflowData = {
       nodes: nodes,
       edges: edges,
-      
+      actionBody: actionBody
     };
-
-    
+    setIsSaveWorkflowClicked(true);
     sendWorkflowData(workflowData)
       .then((response) => {
-        console.log(response); 
-        
+        console.log(response);
       })
       .catch((error) => {
-        console.error('Error saving workflow data:', error); 
-        
+        console.error('Error saving workflow data:', error);
       });
   };
-
+  const handleWorkflowNameChange = (e) => {
+    setWorkflowName(e.target.value);
+  };
 
   return (
     <div className="dndflow">
       
-    <Offcanvas show={show} onHide={handleClose}>
+    <Offcanvas show={showEventForm} onHide={handleCloseEventForm}>
       <Offcanvas.Header >
         <div className="offcanvasheader">
         <Offcanvas.Title><h1>Events</h1></Offcanvas.Title>
-        <Button variant="secondary" onClick={handleClose}>X</Button>
+        <Button variant="secondary" onClick={handleCloseEventForm}>X</Button>
         </div>
       </Offcanvas.Header>
       <Offcanvas.Body>
       <div>
-        <EventForm  updateNodeData={updateNodeData}/>
-        <button onClick={handleSaveWorkflow}>save workflow</button>
-
+        <EventForm updateNodeData={updateNodeData}/>
         </div>
       </Offcanvas.Body>
     </Offcanvas>
+
+
+    <Offcanvas show={showConditionForm} onHide={handleCloseConditionForm}>
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>Condition Form</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          <div style={{ display: 'flex', justifyContent: 'center', height: '100vh' }}>
+          <ConditionForm onSubmit={(data) => { setConditionFormData(data); handleCloseConditionForm(); }} />
+          </div>
+        </Offcanvas.Body>
+      </Offcanvas>
+
+    <Offcanvas show={showActionForm} onHide={handleCloseActionForm}>
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>Action Form</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          <ActionForm onSubmit={handleActionSubmit} updateNodeData={updateNodeData} setActionBody={setActionBody} />
+        </Offcanvas.Body>
+      </Offcanvas>
 
       <ReactFlowProvider>
         <div className="reactflow-wrapper" ref={reactFlowWrapper}>
@@ -151,6 +188,19 @@ const DnDFlow = () => {
             onLoad={setReactFlowInstance}
             fitView
           >
+            <Panel>
+            <button onClick={handleSaveWorkflow}>save workflow</button>
+            {isSaveWorkflowClicked && (
+          <div>
+          <input
+            type="text"
+            placeholder="Workflow Name"
+            value={workflowName}
+            onChange={handleWorkflowNameChange}
+          />
+        </div>
+      )}
+            </Panel>
             <Controls />
             <Background/>
           </ReactFlow>

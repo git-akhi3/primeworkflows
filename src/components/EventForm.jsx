@@ -17,21 +17,21 @@ const EventForm = ({ updateNodeData }) => {
       fetchEventNames(selectedEventType).then(setEventNames);
     }
   }, [selectedEventType]);
-  const handleSubmit = (event) => {
-    event.preventDefault(); 
+
+  const handleEventSubmit = (event) => {
+    event.preventDefault();
 
     if (!selectedEventType || !selectedEventName) {
       return;
     }
-    
-    
-    updateNodeData({ type: selectedEventType, name: selectedEventName });
+    const label = ` ${selectedEventName.type} : ${selectedEventName.name}`;
+    updateNodeData(selectedEventType,selectedEventName,label);
     setSelectedEventType('');
     setSelectedEventName('');
   };
 
   return (
-    <form className="event-form" onSubmit={handleSubmit}>
+    <form className="event-form" >
       <div>
         <h3>Event Type</h3>
         <select value={selectedEventType} onChange={(e) => setSelectedEventType(e.target.value)}>
@@ -57,7 +57,7 @@ const EventForm = ({ updateNodeData }) => {
           </div>
         </div>
       )}
-      <button onClick={handleSubmit} type="submit">Submit</button>
+      <button onClick={handleEventSubmit} type="submit">Submit</button>
     </form>
   );
 };
